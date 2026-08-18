@@ -2,39 +2,63 @@
 
 A lightweight, reusable methodology for keeping AI-assisted software projects aligned with their current project context, development rules, and quality gates.
 
-The core principle is simple: make the correct path the easiest path.
+The core principle is simple: **make the correct path the easiest path**.
 
-This repository provides a central, reusable integrity layer that target repositories can call from GitHub Actions. Target repositories keep their own project knowledge in a structured `SKILL.md`; this framework provides deterministic context checks, marker rotation, protected validation logic, and optional supervisory review instructions.
+A target repository keeps its current project knowledge in `SKILL.md`. This repository provides a reusable GitHub Actions validator that derives a deterministic challenge directly from the current skill text. There are no embedded markers, no quiz database, and no subjective blocking review.
 
-## Goals
+## What it protects against
 
-- Reduce context drift in long-running AI-assisted projects.
-- Make stale project knowledge easy to detect.
-- Keep critical validation logic outside the repository being validated.
-- Avoid subjective or bureaucratic commit gates.
-- Complement, not replace, linters, tests, build checks, and code review.
-- Keep the integration in target repositories minimal.
+Long-running AI-assisted projects can drift even when individual changes compile and pass tests. A coding agent may start from stale context, remember an obsolete policy, or unintentionally change project direction while producing technically valid code.
+
+AICI adds one cheap requirement before integration: the contributor must use the current `SKILL.md` to answer a small deterministic word-position challenge.
 
 ## Intended flow
 
 ```text
-Target repository
-  SKILL.md + code + tests
+Target task
+  1. Read/review SKILL.md before implementation
+  2. Implement and test normally
         |
         v
-small GitHub Actions caller
+commit / integration attempt
         |
         v
 AI_commit_integrity_check
-  context challenge
-  marker validation
-  protected policy checks
-  optional supervisor instructions
+  derives challenge from current SKILL.md
+  validates AI-Context-Key trailer
+        |
+        +---- normal project lint/tests/build gates
         |
         v
-GitHub status check / advisory review
+integration branch / DEV pipeline
 ```
+
+If `SKILL.md` changes, its hash changes. That automatically changes the challenge and invalidates keys derived from the previous version. Nothing needs to be rotated or edited by hand.
+
+## Context challenge
+
+A challenge looks like:
+
+```text
+W42 W8 W119 W31 W74 W16
+```
+
+`W42` means the 42nd normalized word in the current `SKILL.md`. The response is those words, in challenge order, joined with `-` and supplied in the commit message:
+
+```text
+AI-Context-Key: word42-word8-word119-word31-word74-word16
+```
+
+The mechanism is intentionally designed for cooperative developers and agents, not adversarial security. It makes reading the current project context the obvious path and makes stale remembered context fail automatically.
+
+## Separation of responsibilities
+
+- **Target repository:** project `SKILL.md`, source code, tests, and project-specific quality checks.
+- **This repository:** deterministic context validator, reusable workflow, methodology, and optional supervisor-review instructions.
+- **Optional AI supervisor:** advisory project-management review for conceptual drift; it does not replace deterministic gates.
+
+Consumers should pin a released tag or immutable commit SHA of this repository.
 
 ## Status
 
-Initial framework implementation is being developed. The first real integration target is BGO.
+Initial framework implementation is under development. The first integration target is BGO.
