@@ -1,33 +1,29 @@
 # Project Skill
 
-Read this file before working on the project. The context markers are managed by AI Commit Integrity Check.
+Read this entire file before working on the project. It is the compact operational context for contributors and coding agents.
 
-<!-- AICI:BEGIN id=mission marker=AAAA -->
+Every task should begin with an explicit step to review this file. Before integration, AI Commit Integrity Check will ask for a deterministic response derived from the current text. The purpose is not to test trivia; it is to make stale project context fail early and keep the project direction, quality rules, and current state present during development.
+
 ## Mission
 
 Describe what the project is, what success means, and the non-negotiable product direction.
-<!-- AICI:END id=mission -->
 
-<!-- AICI:BEGIN id=architecture marker=BBBB -->
 ## Architecture
 
-Describe the major architectural boundaries, invariants, and concepts that must remain consistent.
-<!-- AICI:END id=architecture -->
+Describe the major architectural boundaries, invariants, domain concepts, and forbidden shortcuts that must remain consistent.
 
-<!-- AICI:BEGIN id=development-policy marker=CCCC -->
 ## Development policy
 
-Describe branching, validation, documentation, deployment, and code-quality rules.
-<!-- AICI:END id=development-policy -->
+Describe branching, validation, documentation, deployment, and code-quality rules. State clearly that contributors must not weaken or bypass quality checks merely to make a change pass.
 
-<!-- AICI:BEGIN id=current-state marker=DDDD -->
 ## Current state
 
-Describe the active milestone, what is implemented, what is not yet implemented, and the next intended work.
-<!-- AICI:END id=current-state -->
+Describe the active milestone, what is implemented, what is not yet implemented, known risks or blockers, and the next intended work.
 
-<!-- AICI:BEGIN id=technology-baseline marker=EEEE -->
 ## Technology baseline
 
-List the active versions and authoritative documentation expectations for technologies whose behavior changes over time.
-<!-- AICI:END id=technology-baseline -->
+List the active versions and authoritative documentation expectations for technologies whose behavior changes over time. Require current official documentation to be checked when a task depends on version-sensitive behavior.
+
+## Completion criteria
+
+Describe what evidence is required before work can be called complete: tests, build/export checks, integration evidence, documentation updates, or other project-specific proof.
