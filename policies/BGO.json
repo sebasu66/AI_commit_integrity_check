@@ -1,0 +1,21 @@
+{
+  "project": "BGO",
+  "gdscript": {
+    "max_file_lines": 500,
+    "max_function_lines": 60,
+    "require_public_function_docs": true,
+    "file_names": "snake_case",
+    "class_names": "PascalCase",
+    "function_names": "snake_case",
+    "variable_names": "snake_case",
+    "signal_names": "snake_case",
+    "constant_names": "UPPER_SNAKE_CASE"
+  },
+  "components": {
+    "enabled": true,
+    "root": "src/components",
+    "manifest_name": "component.jsonh",
+    "require_matching_script": true,
+    "require_matching_scene": true
+  }
+}
