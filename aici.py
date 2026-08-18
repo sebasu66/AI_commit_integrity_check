@@ -63,6 +63,16 @@ def context_key(text: str) -> str:
     return "-".join(marker for _, marker in parse_sections(text))
 
 
+def normalize_markers(text: str) -> str:
+    """Return SKILL text with marker values removed from the comparison surface."""
+    parse_sections(text)
+
+    def replace(match: re.Match[str]) -> str:
+        return f"<!-- AICI:BEGIN id={match.group(1)} marker=<AICI-MARKER> -->"
+
+    return BEGIN_RE.sub(replace, text)
+
+
 def new_marker(length: int) -> str:
     return "".join(secrets.choice(ALPHABET) for _ in range(length))
 
@@ -116,6 +126,16 @@ def cmd_rotate(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_changed(args: argparse.Namespace) -> int:
+    before = normalize_markers(read(args.before))
+    after = normalize_markers(read(args.after))
+    if before == after:
+        print("unchanged")
+        return 1
+    print("changed")
+    return 0
+
+
 def cmd_validate(args: argparse.Namespace) -> int:
     validate(read(args.skill), read(args.message_file))
     print("AI context integrity check passed")
@@ -134,6 +154,11 @@ def build_parser() -> argparse.ArgumentParser:
     rotate.add_argument("--skill", default="SKILL.md")
     rotate.add_argument("--length", type=int, default=4)
     rotate.set_defaults(func=cmd_rotate)
+
+    changed = sub.add_parser("changed", help="detect SKILL content changes while ignoring marker values")
+    changed.add_argument("--before", required=True)
+    changed.add_argument("--after", required=True)
+    changed.set_defaults(func=cmd_changed)
 
     validate_cmd = sub.add_parser("validate", help="validate commit message context key")
     validate_cmd.add_argument("--skill", default="SKILL.md")
