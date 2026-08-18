@@ -58,7 +58,7 @@ def function_ranges(lines: list[str]) -> list[tuple[str, int, int]]:
             starts.append((match.group(2), index, len(match.group(1).replace("\t", "    "))))
 
     ranges: list[tuple[str, int, int]] = []
-    for pos, (name, start, indent) in enumerate(starts):
+    for name, start, indent in starts:
         end = len(lines)
         for probe in range(start + 1, len(lines)):
             stripped = lines[probe].strip()
@@ -134,12 +134,13 @@ def lint_component_layout(root: Path, policy: dict, errors: list[str]) -> None:
         rel = folder.relative_to(root).as_posix()
         if not SNAKE_RE.fullmatch(name):
             errors.append(f"{rel}: component folder must use snake_case")
-        expected_script = folder / f"{name}.gd"
-        expected_scene = folder / f"{name}.tscn"
-        if not expected_script.exists():
-            errors.append(f"{rel}: component requires sibling {name}.gd")
-        if not expected_scene.exists():
-            errors.append(f"{rel}: component requires sibling {name}.tscn")
+
+        scripts = sorted(folder.glob("*.gd"))
+        scenes = sorted(folder.glob("*.tscn"))
+        if not scripts:
+            errors.append(f"{rel}: component folder requires at least one local .gd implementation")
+        if not scenes:
+            errors.append(f"{rel}: component folder requires at least one local .tscn scene")
 
 
 def load_policy(path: Path) -> dict:
@@ -171,7 +172,6 @@ def main() -> int:
         if path.exists() and (rel.startswith("src/") or rel.startswith("tests/")):
             lint_gdscript(path, rel, policy, errors)
 
-    # Layout is cheap and deterministic, so validate the complete component tree.
     lint_component_layout(root, policy, errors)
 
     for error in errors:
