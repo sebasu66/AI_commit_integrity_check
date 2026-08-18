@@ -1,0 +1,30 @@
+name: Framework Self Test
+
+on:
+  push:
+    branches:
+      - main
+      - feature/**
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: CLI smoke test
+        run: |
+          cp templates/SKILL.template.md "$RUNNER_TEMP/SKILL.md"
+          python aici.py rotate --skill "$RUNNER_TEMP/SKILL.md"
+          python aici.py key --skill "$RUNNER_TEMP/SKILL.md"
