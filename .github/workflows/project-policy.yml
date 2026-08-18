@@ -1,0 +1,43 @@
+name: AICI Project Policy
+
+on:
+  workflow_call:
+    inputs:
+      policy:
+        description: Protected policy name stored under policies/<name>.json
+        required: true
+        type: string
+      base_sha:
+        description: Base commit for changed-file linting; empty means scan all GDScript
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  policy-lint:
+    name: Protected project policy
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          path: target
+
+      - name: Checkout integrity framework
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: integrity
+
+      - name: Validate project policy
+        shell: bash
+        run: |
+          python3 integrity/policy_lint.py \
+            --root target \
+            --policy "integrity/policies/${{ inputs.policy }}.json" \
+            --base "${{ inputs.base_sha }}"
