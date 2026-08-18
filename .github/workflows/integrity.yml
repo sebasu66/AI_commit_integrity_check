@@ -1,0 +1,42 @@
+name: AI Commit Integrity
+
+on:
+  workflow_call:
+    inputs:
+      skill_path:
+        description: Path to the target repository SKILL file
+        required: false
+        default: SKILL.md
+        type: string
+
+jobs:
+  context-integrity:
+    name: Context integrity
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout target repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+          path: target
+
+      - name: Checkout integrity framework
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: integrity
+
+      - name: Read current commit message
+        shell: bash
+        run: git -C target log -1 --pretty=%B > "$RUNNER_TEMP/aici-commit-message.txt"
+
+      - name: Validate current project context key
+        shell: bash
+        run: |
+          python3 integrity/aici.py validate \
+            --skill "target/${{ inputs.skill_path }}" \
+            --message-file "$RUNNER_TEMP/aici-commit-message.txt"
