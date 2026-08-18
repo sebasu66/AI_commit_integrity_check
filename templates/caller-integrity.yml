@@ -1,0 +1,18 @@
+name: AI Commit Integrity
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  integrity:
+    uses: sebasu66/AI_commit_integrity_check/.github/workflows/integrity.yml@<PINNED_SHA_OR_RELEASE_TAG>
+    with:
+      skill_path: SKILL.md
+    permissions:
+      contents: read
