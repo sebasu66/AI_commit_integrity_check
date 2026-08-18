@@ -1,0 +1,15 @@
+name: Rotate AI Skill Markers
+
+on:
+  push:
+    paths:
+      - SKILL.md
+
+jobs:
+  rotate:
+    uses: sebasu66/AI_commit_integrity_check/.github/workflows/rotate-skill.yml@<PINNED_SHA_OR_RELEASE_TAG>
+    with:
+      skill_path: SKILL.md
+      marker_length: 4
+    permissions:
+      contents: write
