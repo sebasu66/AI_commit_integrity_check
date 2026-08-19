@@ -15,6 +15,8 @@ from pathlib import Path
 
 START = "<!-- AICI:POLICY:START -->"
 END = "<!-- AICI:POLICY:END -->"
+LEGACY_ANCHOR = "Machine-enforced limits for newly changed GDScript files are currently:"
+NEXT_HEADING = "### File placement"
 
 
 def render(policy: dict) -> str:
@@ -48,10 +50,26 @@ def render(policy: dict) -> str:
 def replace_block(skill_text: str, generated: str) -> str:
     start = skill_text.find(START)
     end = skill_text.find(END)
-    if start < 0 or end < 0 or end < start:
-        raise ValueError(f"SKILL.md must contain managed markers {START} and {END}")
-    end += len(END)
-    return skill_text[:start] + generated.rstrip() + skill_text[end:]
+    if start >= 0 and end >= start:
+        end += len(END)
+        return skill_text[:start] + generated.rstrip() + skill_text[end:]
+
+    # One-time migration path for existing skills that predate managed markers.
+    legacy = skill_text.find(LEGACY_ANCHOR)
+    next_heading = skill_text.find(NEXT_HEADING, legacy if legacy >= 0 else 0)
+    if legacy >= 0 and next_heading > legacy:
+        prefix = skill_text[:legacy]
+        suffix = skill_text[next_heading:]
+        guardrail = (
+            "These limits are guardrails, not targets. Prefer smaller cohesive functions/classes. "
+            "If an implementation needs to exceed an objective limit, refactor responsibilities "
+            "rather than weakening the rule inside the target repository.\n\n"
+        )
+        return prefix + generated.rstrip() + "\n\n" + guardrail + suffix
+
+    raise ValueError(
+        f"SKILL.md must contain managed markers {START}/{END} or the supported legacy policy section"
+    )
 
 
 def main() -> int:
