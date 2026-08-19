@@ -127,11 +127,15 @@ def lint_gdscript(path: Path, rel: str, policy: dict, errors: list[str]) -> None
             errors.append(f"{rel}:{number}: signals must use snake_case")
 
         var_match = VAR_RE.match(line)
-        if var_match and not SNAKE_RE.fullmatch(var_match.group(1)):
-            errors.append(f"{rel}:{number}: variables must use snake_case")
+        if var_match:
+            var_name = var_match.group(1)
+            public_name = var_name.lstrip("_")
+            if not public_name or not SNAKE_RE.fullmatch(public_name):
+                errors.append(f"{rel}:{number}: variables must use snake_case")
 
     for name, start, end in function_ranges(lines):
-        if not (SNAKE_RE.fullmatch(name.lstrip("_")) or name.startswith("_")):
+        function_name = name.lstrip("_")
+        if not function_name or not SNAKE_RE.fullmatch(function_name):
             errors.append(f"{rel}:{start + 1}: function '{name}' must use snake_case")
         length = end - start
         if length > max_function_lines:
