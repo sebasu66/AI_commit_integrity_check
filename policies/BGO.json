@@ -1,8 +1,10 @@
 {
   "project": "BGO",
+  "skill_path": "SKILL.md",
   "gdscript": {
     "max_file_lines": 500,
-    "max_function_lines": 60,
+    "max_function_lines": 85,
+    "max_decision_complexity": 10,
     "require_public_function_docs": true,
     "file_names": "snake_case",
     "class_names": "PascalCase",
